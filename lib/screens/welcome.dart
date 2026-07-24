@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:ui';
 
+import 'package:beshence_sdk_flutter/beshence_sdk_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -11,6 +14,20 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    _controller = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -62,6 +79,29 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   if (!await launchUrl(url)) {
                   throw Exception('Could not launch $url');
                   }
+
+                  showDialog(context: context, builder: (context) => AlertDialog.adaptive(
+                    content: TextField(
+                      controller: _controller,
+                      onSubmitted: (value) async {
+
+                        var json = jsonDecode(utf8.decode(base64Decode(value)));
+
+                        String tid = json["tid"];
+                        String aid = json["aid"];
+                        List<Map<String, dynamic>> vs = List<Map<String, dynamic>>.from(json["vs"]);
+
+                        BeshenceAccount account = await Beshence.createAccount(id: aid, oauthTokenId: tid, initAccountEvent: false);
+                        for (Map<String, dynamic> v in vs) {
+                          account.addVault(bankId: v["b"], vaultId: v["i"], priority: v["p"], addVaultEvent: false);
+                        }
+                        account.createChain("main");
+                        account.createChain("notes");
+                        BeshenceDaemon.of(account).startDaemon();
+                        context.go("/");
+                      },
+                    )
+                  ));
                 },
                 child: const Text('Register / Log in'),
               ),
