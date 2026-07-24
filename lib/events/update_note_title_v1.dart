@@ -22,14 +22,14 @@ class UpdateNoteTitleV1EventSpec implements BeshenceEventSpec<UpdateNoteTitleV1E
   String get name => "update_note_title_v1";
 
   @override
-  FutureOr<void> apply(UpdateNoteTitleV1Event event) async {
+  FutureOr<bool> apply(UpdateNoteTitleV1Event event) async {
     final account = Beshence.selectedAccount!;
     NoteV1? note = NoteV1.getNote(event.noteId);
     if(note == null) {
-      return;
+      return true;
     }
     if(note.titleUpdatedAt?.isAfter(event.updatedAt) ?? false) {
-      return;
+      return true;
     }
     NoteV1 updatedNote = NoteV1(
         id: note.id,
@@ -44,6 +44,7 @@ class UpdateNoteTitleV1EventSpec implements BeshenceEventSpec<UpdateNoteTitleV1E
     );
     await notesV1Box.put("${account.id}_${note.id}", updatedNote);
     notesChangeNotifier.updateNotes();
+    return true;
   }
 
   @override

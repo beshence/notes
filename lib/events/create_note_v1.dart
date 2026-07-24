@@ -20,9 +20,9 @@ class CreateNoteV1EventSpec implements BeshenceEventSpec<CreateNoteV1Event> {
   String get name => "create_note_v1";
 
   @override
-  FutureOr<void> apply(CreateNoteV1Event event) async {
+  FutureOr<bool> apply(CreateNoteV1Event event) async {
     if(NoteV1.getAllNotes().any((note) => note.id == event.noteId)) {
-      return;
+      return true;
     }
     NoteV1 note = NoteV1(
         id: event.noteId,
@@ -37,6 +37,7 @@ class CreateNoteV1EventSpec implements BeshenceEventSpec<CreateNoteV1Event> {
     );
     await NoteV1.addNote(note);
     notesChangeNotifier.updateNotes();
+    return true;
   }
 
   @override

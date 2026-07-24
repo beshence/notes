@@ -20,11 +20,11 @@ class DeleteNoteV1EventSpec implements BeshenceEventSpec<DeleteNoteV1Event> {
   String get name => "delete_note_v1";
 
   @override
-  FutureOr<void> apply(DeleteNoteV1Event event) async {
+  FutureOr<bool> apply(DeleteNoteV1Event event) async {
     final account = Beshence.selectedAccount!;
     NoteV1? note = NoteV1.getNote(event.noteId);
     if(note == null) {
-      return;
+      return true;
     }
     NoteV1 deletedNote = NoteV1(
         id: note.id,
@@ -39,6 +39,7 @@ class DeleteNoteV1EventSpec implements BeshenceEventSpec<DeleteNoteV1Event> {
     );
     await notesV1Box.put("${account.id}_${note.id}", deletedNote);
     notesChangeNotifier.updateNotes();
+    return true;
   }
 
   @override
