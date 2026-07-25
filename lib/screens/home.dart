@@ -22,18 +22,6 @@ class _HomeScreenState extends State<HomeScreen> {
           title: Text("Beshence Notes"),
           actions: [
             IconButton(
-                icon: Icon(Icons.data_exploration_outlined),
-                onPressed: () {
-                  var daemon = BeshenceDaemon.of(Beshence.selectedAccount!);
-                  var state = daemon.daemonState();
-                  if (state == DaemonState.stopped) {
-                    daemon.startDaemon();
-                  } else if(state == DaemonState.running) {
-                    daemon.stopDaemon();
-                  }
-                }
-            ),
-            IconButton(
                 icon: Icon(Icons.settings),
                 onPressed: () {
                   context.push("/settings");
@@ -150,5 +138,11 @@ class _HomeScreenState extends State<HomeScreen> {
     await notesChain.addEvent(event);
     notesChangeNotifier.updateNotes();
     context.push('/note/${note.id}');
+  }
+
+  @override
+  void initState() {
+    BeshenceDaemon.of(Beshence.selectedAccount!).startDaemon();
+    super.initState();
   }
 }
