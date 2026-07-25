@@ -52,7 +52,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
         BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-          child: AlertDialog.adaptive(
+          child: AlertDialog(
             constraints: BoxConstraints(maxWidth: dialogWidth),
             title: Text('Welcome to Beshence Notes!',),
             content: Text(
@@ -80,7 +80,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   throw Exception('Could not launch $url');
                   }
 
-                  showDialog(context: context, builder: (context) => AlertDialog.adaptive(
+                  showDialog(context: context, builder: (context) => AlertDialog(
                     content: TextField(
                       controller: _controller,
                       onSubmitted: (value) async {
