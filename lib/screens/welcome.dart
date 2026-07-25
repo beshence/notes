@@ -73,8 +73,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               FilledButton(
                 onPressed: () async {
                   final Uri url = Uri.parse('https://account.beshence.com/#/oauth/authorize?'
-                      'client_id=BeshenceNotes&'
-                      'response_type=base64data&'
+                      'client_id=com.beshence.notes&'
+                      'response_type=base64account&'
                       'scope=chain:main:r;chain:notes:rw');
                   if (!await launchUrl(url)) {
                   throw Exception('Could not launch $url');
