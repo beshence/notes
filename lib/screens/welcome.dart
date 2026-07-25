@@ -14,19 +14,7 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  late TextEditingController _controller;
-
-  @override
-  void initState() {
-    _controller = TextEditingController();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  bool _showCodeDialog = false;
 
   @override
   Widget build(BuildContext context) {
@@ -52,65 +40,146 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
         BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-          child: AlertDialog(
-            constraints: BoxConstraints(maxWidth: dialogWidth),
-            title: Text('Welcome to Beshence Notes!',),
-            content: Text(
-              'To get started, register new Beshence Account or log in to existing one.', style: Theme.of(context).textTheme.bodyLarge,),
-            actionsOverflowButtonSpacing: 8.0,
-            actionsAlignment: .spaceBetween,
-            icon: Icon(Icons.sticky_note_2_outlined, size: 36,),
-            actionsOverflowDirection: .up,
-            actions: [
-              TextButton(
-                onPressed: () {} /*=> showModalBottomSheet<void>(
-                    isScrollControlled: true,
-                    context: context,
-                    builder: (context) => OfflineModal()
-                )*/,
-                child: const Text('Other options'),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  final Uri url = Uri.parse('https://account.beshence.com/#/oauth/authorize?'
-                      'client_id=com.beshence.notes&'
-                      'response_type=base64account&'
-                      'scope=chain:main:r;chain:notes:rw');
-                  if (!await launchUrl(url)) {
-                  throw Exception('Could not launch $url');
-                  }
-
-                  showDialog(context: context, builder: (context) => AlertDialog(
-                    content: TextField(
-                      controller: _controller,
-                      onSubmitted: (value) async {
-
-                        var json = jsonDecode(utf8.decode(base64Decode(value)));
-
-                        String tid = json["tid"];
-                        String aid = json["aid"];
-                        List<Map<String, dynamic>> vs = List<Map<String, dynamic>>.from(json["vs"]);
-
-                        BeshenceAccount account = await Beshence.createAccount(id: aid, oauthTokenId: tid, initAccountEvent: false);
-                        for (Map<String, dynamic> v in vs) {
-                          account.addVault(bankId: v["b"], vaultId: v["i"], priority: v["p"], addVaultEvent: false);
-                        }
-                        account.createChain("main");
-                        account.createChain("notes");
-                        BeshenceDaemon.of(account).startDaemon();
-                        context.go("/");
-                      },
-                    )
-                  ));
-                },
-                child: const Text('Register / Log in'),
-              ),
-            ],
-          ),
+            child: (!_showCodeDialog)
+                ? WelcomeMainDialog(
+                dialogWidth: dialogWidth,
+                onContinue: () => setState(() {
+                  _showCodeDialog = true;
+                })
+            )
+                : WelcomeCodeDialog(
+              dialogWidth: dialogWidth,
+              onBack: () => setState(() {
+                _showCodeDialog = false;
+              }),
+            )
         ),
       ],
     );
   }
+}
+
+class WelcomeMainDialog extends StatelessWidget {
+  final double dialogWidth;
+  final void Function() onContinue;
+
+  const WelcomeMainDialog({super.key, required this.dialogWidth, required this.onContinue});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      constraints: BoxConstraints(maxWidth: dialogWidth),
+      title: Text('Welcome to Beshence Notes!',),
+      content: Text(
+        'To get started, register new Beshence Account or log in to existing one.', style: Theme.of(context).textTheme.bodyLarge,),
+      actionsOverflowButtonSpacing: 8.0,
+      actionsAlignment: .spaceBetween,
+      icon: Icon(Icons.sticky_note_2_outlined, size: 36,),
+      actionsOverflowDirection: .up,
+      actions: [
+        TextButton(
+          onPressed: () {} /*=> showModalBottomSheet<void>(
+                    isScrollControlled: true,
+                    context: context,
+                    builder: (context) => OfflineModal()
+                )*/,
+          child: const Text('Other options'),
+        ),
+        FilledButton(
+          onPressed: () async {
+            final Uri url = Uri.parse('https://account.beshence.com/#/oauth/authorize?'
+                'client_id=com.beshence.notes&'
+                'response_type=base64account&'
+                'scope=chain:main:r;chain:notes:rw');
+            onContinue();
+            if (!await launchUrl(url)) {
+              throw Exception('Could not launch $url');
+            }
+          },
+          child: const Text('Register / Log in'),
+        ),
+      ],
+    );
+  }
+}
+
+class WelcomeCodeDialog extends StatefulWidget {
+  final double dialogWidth;
+  final void Function() onBack;
+
+  const WelcomeCodeDialog({super.key, required this.dialogWidth, required this.onBack});
+
+  @override
+  State<StatefulWidget> createState() => _WelcomeCodeDialogState();
+
+}
+
+class _WelcomeCodeDialogState extends State<WelcomeCodeDialog> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    _controller = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+        constraints: BoxConstraints(maxWidth: widget.dialogWidth),
+        title: Text('Provide the code',),
+        content: Column(
+          mainAxisSize: .min,
+          children: [
+            Text('You\'ve been redirected to Beshence '
+                'Account Manager to create code. Copy '
+                'it and then paste it down below.',
+              style: Theme.of(context).textTheme.bodyLarge,),
+            TextField(
+              controller: _controller,
+              onSubmitted: (value) async => await login(context, value),
+            )
+          ],
+        ),
+        actionsOverflowButtonSpacing: 8.0,
+        actionsAlignment: .spaceBetween,
+        icon: Icon(Icons.sticky_note_2_outlined, size: 36,),
+        actionsOverflowDirection: .up,
+        actions: [
+          TextButton(
+            onPressed: () => widget.onBack(),
+            child: const Text('Back'),
+          ),
+          FilledButton(
+            onPressed: () async => await login(context, _controller.text),
+            child: const Text('Log in'),
+          ),
+        ]
+    );
+  }
+}
+
+Future<void> login(BuildContext context, String value) async {
+  var json = jsonDecode(utf8.decode(base64Decode(value)));
+
+  String tid = json["tid"];
+  String aid = json["aid"];
+  List<Map<String, dynamic>> vs = List<Map<String, dynamic>>.from(json["vs"]);
+
+  BeshenceAccount account = await Beshence.createAccount(id: aid, oauthTokenId: tid, initAccountEvent: false);
+  for (Map<String, dynamic> v in vs) {
+    account.addVault(bankId: v["b"], vaultId: v["i"], priority: v["p"], addVaultEvent: false);
+  }
+  account.createChain("main");
+  account.createChain("notes");
+  BeshenceDaemon.of(account).startDaemon();
+  context.go("/");
 }
 
 /*class OfflineModal extends StatelessWidget {
