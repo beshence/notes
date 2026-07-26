@@ -22,9 +22,39 @@ class _HomeScreenState extends State<HomeScreen> {
           title: Text("Beshence Notes"),
           actions: [
             IconButton(
-                icon: Icon(Icons.settings),
+                icon: Icon(Icons.search),
+                onPressed: () {}
+            ),
+            IconButton(
+                icon: Icon(Icons.account_circle_outlined),
                 onPressed: () {
-                  context.push("/settings");
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) => SingleChildScrollView(
+                        child: SafeArea(
+                            child: Padding(
+                                padding: const EdgeInsets.all(32.0),
+                                child: Column(
+                                    children: [
+                                      ListTile(
+                                        contentPadding: EdgeInsets.all(0),
+                                        leading: Icon(Icons.settings),
+                                        title: RichText(
+                                            text: TextSpan(
+                                                style: Theme.of(context).textTheme.bodyLarge,
+                                                children: [
+                                                  TextSpan(text: "Beshence Notes settings ")
+                                                ]
+                                            )
+                                        ),
+                                        onTap: () => context.push("/settings"),
+                                      ),
+                                    ],
+                                )
+                            )
+                        )
+                    )
+                  );
                 }
             ),
           ]
