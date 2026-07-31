@@ -20,21 +20,22 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
           title: Text("Beshence Notes"),
+          actionsPadding: .only(right: 8),
           actions: [
             IconButton(
                 icon: Icon(Icons.search),
                 onPressed: () {}
             ),
-            IconButton(
-                icon: Icon(Icons.account_circle_outlined),
+            Beshence.selectedAccount!.avatarButton(
+                context: context,
                 onPressed: () {
                   showModalBottomSheet(
-                    context: context,
-                    builder: (context) => SingleChildScrollView(
-                        child: SafeArea(
-                            child: Padding(
-                                padding: const EdgeInsets.all(32.0),
-                                child: Column(
+                      context: context,
+                      builder: (context) => SingleChildScrollView(
+                          child: SafeArea(
+                              child: Padding(
+                                  padding: const EdgeInsets.all(32.0),
+                                  child: Column(
                                     children: [
                                       ListTile(
                                         contentPadding: EdgeInsets.all(0),
@@ -50,10 +51,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                         onTap: () => context.push("/settings"),
                                       ),
                                     ],
-                                )
-                            )
-                        )
-                    )
+                                  )
+                              )
+                          )
+                      )
                   );
                 }
             ),
