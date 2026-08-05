@@ -110,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return notes.isNotEmpty
                             ? Padding(
                             padding: EdgeInsets.only(
-                                top: 16,
+                                top: 0,
                                 left: 16,
                                 bottom: 88,
                                 right: 16),
