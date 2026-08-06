@@ -17,7 +17,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    double topPadding = MediaQuery.paddingOf(context).top > 0 ? 8 : 0;
+    double topPaddingOfNotesList = MediaQuery.paddingOf(context).top > 0 ? 8 : 0;
+    double bottomPadding = MediaQuery.paddingOf(context).bottom;
     return Scaffold(
       appBar: AppBar(
           title: Text("Beshence Notes"),
@@ -91,9 +92,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         return notes.isNotEmpty
                             ? Padding(
                             padding: EdgeInsets.only(
-                                top: topPadding,
+                                top: topPaddingOfNotesList,
                                 left: 16,
-                                bottom: 88,
+                                bottom: 88+bottomPadding,
                                 right: 16),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -111,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     builder: (BuildContext context, Widget? child) {
                       if(NoteV1.getNotesCount() != 0) return SizedBox.shrink();
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 88),
+                        padding: EdgeInsets.only(bottom: 88+bottomPadding),
                         child: Center(
                           child: Text("No notes."),
                         ),
