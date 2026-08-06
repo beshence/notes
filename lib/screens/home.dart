@@ -17,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
+    double topPadding = MediaQuery.paddingOf(context).top > 0 ? 8 : 0;
     return Scaffold(
       appBar: AppBar(
           title: Text("Beshence Notes"),
@@ -90,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return notes.isNotEmpty
                             ? Padding(
                             padding: EdgeInsets.only(
-                                top: 0,
+                                top: topPadding,
                                 left: 16,
                                 bottom: 88,
                                 right: 16),
