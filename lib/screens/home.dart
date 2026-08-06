@@ -27,36 +27,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () {}
             ),
             Beshence.selectedAccount!.avatarButton(
-                context: context,
-                onPressed: () {
-                  showModalBottomSheet(
-                      context: context,
-                      builder: (context) => SingleChildScrollView(
-                          child: SafeArea(
-                              child: Padding(
-                                  padding: const EdgeInsets.all(32.0),
-                                  child: Column(
-                                    children: [
-                                      ListTile(
-                                        contentPadding: EdgeInsets.all(0),
-                                        leading: Icon(Icons.settings),
-                                        title: RichText(
-                                            text: TextSpan(
-                                                style: Theme.of(context).textTheme.bodyLarge,
-                                                children: [
-                                                  TextSpan(text: "Beshence Notes settings ")
-                                                ]
-                                            )
-                                        ),
-                                        onTap: () => context.push("/settings"),
-                                      ),
-                                    ],
-                                  )
-                              )
-                          )
-                      )
-                  );
-                }
+                onPressed: () => BeshenceWidgets.showAccountChooserModal(
+                  context: context,
+                  children: [
+                    BeshenceWidgets.accountChooserTile(
+                        title: "Beshence Notes settings",
+                        leading: Icon(Icons.settings),
+                        onTap: () => context.push("/settings")
+                    ),
+                  ]
+                )
             ),
           ]
       ),
